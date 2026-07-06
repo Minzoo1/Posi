@@ -1,66 +1,151 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+export const dynamic = "force-dynamic";
 
-export default function Home() {
+import Link from "next/link";
+import { connectDB } from "@/lib/db";
+import { Player } from "@/lib/models/Player";
+import { Match } from "@/lib/models/Match";
+import * as s from "./styles/layout.css";
+import * as c from "./styles/components.css";
+import * as d from "./dashboard.css";
+
+async function getData() {
+  await connectDB();
+  const [players, matches] = await Promise.all([
+    Player.find().sort({ elo: -1 }).lean(),
+    Match.find().sort({ date: -1 }).limit(5).lean(),
+  ]);
+  return { players, matches };
+}
+
+export default async function DashboardPage() {
+  const { players, matches } = await getData();
+  const topPlayer = players[0];
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div>
+      <div className={s.pageHeader}>
+        <h1 className={s.pageTitle}>대시보드</h1>
+        <p className={s.pageSubtitle}>PosiEf 내전 현황</p>
+      </div>
+
+      <div className={s.grid4} style={{ marginBottom: "24px" }}>
+        <div className={c.statCard}>
+          <div className={c.statLabel}>총 멤버</div>
+          <div className={c.statValue}>{players.length}명</div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className={c.statCard}>
+          <div className={c.statLabel}>총 경기</div>
+          <div className={c.statValue}>{matches.length}경기</div>
         </div>
-      </main>
+        <div className={c.statCard}>
+          <div className={c.statLabel}>1위 플레이어</div>
+          <div className={c.statValue} style={{ fontSize: "17px" }}>
+            {topPlayer?.name ?? "-"}
+          </div>
+          {topPlayer && (
+            <div className={d.statSubValue}>ELO {Math.round(topPlayer.elo)}</div>
+          )}
+        </div>
+        <div className={c.statCard}>
+          <div className={c.statLabel}>바로가기</div>
+          <div className={d.quickActions}>
+            <Link href="/team-builder">
+              <button className={`${c.btn} ${c.btnPrimary} ${d.fullWidth}`}>팀 뽑기</button>
+            </Link>
+            <Link href="/matches/new">
+              <button className={`${c.btn} ${c.btnGhost} ${d.fullWidth}`}>경기 입력</button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className={s.grid2}>
+        <div className={s.card}>
+          <h2 className={d.sectionTitle}>ELO 리더보드</h2>
+          {players.length === 0 ? (
+            <p className={d.emptyState}>멤버를 추가해주세요</p>
+          ) : (
+            <table className={c.table}>
+              <thead>
+                <tr>
+                  <th className={c.th}>#</th>
+                  <th className={c.th}>플레이어</th>
+                  <th className={c.th}>티어</th>
+                  <th className={c.th}>ELO</th>
+                  <th className={c.th}>승/패</th>
+                  <th className={c.th}>승률</th>
+                </tr>
+              </thead>
+              <tbody>
+                {players.slice(0, 10).map((p, i) => {
+                  const total = p.wins + p.losses;
+                  const wr = total > 0 ? Math.round((p.wins / total) * 100) : 0;
+                  return (
+                    <tr key={String(p._id)} className={c.trHover}>
+                      <td className={`${c.td} ${d.rankNum} ${i < 3 ? c.goldText : c.mutedText}`}>
+                        {i + 1}
+                      </td>
+                      <td className={c.td}>
+                        <div className={d.playerName}>{p.name}</div>
+                        <div className={d.playerTag}>#{p.tag}</div>
+                      </td>
+                      <td className={c.td}>
+                        <span style={{ color: c.tierColors[p.tier] ?? "#64748b", fontWeight: "700", fontSize: "12px" }}>
+                          {p.tier} {p.rank}
+                        </span>
+                      </td>
+                      <td className={`${c.td} ${d.eloValue}`}>{Math.round(p.elo)}</td>
+                      <td className={c.td}>
+                        <span className={c.winText}>{p.wins}W</span>
+                        {" / "}
+                        <span className={c.lossText}>{p.losses}L</span>
+                      </td>
+                      <td className={c.td}>
+                        <span className={c.wrBadge[wr >= 50 ? "win" : "loss"]}>{wr}%</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+          {players.length > 10 && (
+            <Link href="/players" className={d.viewMore}>전체 보기</Link>
+          )}
+        </div>
+
+        <div className={s.card}>
+          <h2 className={d.sectionTitle}>최근 경기</h2>
+          {matches.length === 0 ? (
+            <p className={d.emptyState}>경기 기록이 없습니다</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {matches.map((m) => {
+                const date = new Date(m.date).toLocaleDateString("ko-KR");
+                const mins = Math.floor(m.duration / 60);
+                return (
+                  <div key={String(m._id)} className={d.matchCard}>
+                    <div>
+                      <div className={d.matchTeams}>
+                        <span className={d.blueTeam}>{m.blueTeamName}</span>
+                        <span className={d.matchSep}>vs</span>
+                        <span className={d.redTeam}>{m.redTeamName}</span>
+                      </div>
+                      <div className={d.matchMeta}>
+                        {date}{mins > 0 ? ` · ${mins}분` : ""}
+                      </div>
+                    </div>
+                    <span className={`${c.badge} ${c.badgeVariant[m.winner === "blue" ? "win" : "loss"]}`}>
+                      {m.winner === "blue" ? m.blueTeamName : m.redTeamName} 승
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          <Link href="/matches" className={d.viewMore}>전체 경기 보기</Link>
+        </div>
+      </div>
     </div>
   );
 }
