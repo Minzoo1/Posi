@@ -121,7 +121,7 @@ export default function MembersPage() {
             <button type="submit" className={`${c.btn} ${c.btnPrimary}`} disabled={adding}>
               {adding ? "등록 중..." : "멤버 등록"}
             </button>
-            <p className={m.hint}>* Riot API 키가 설정되면 티어가 자동으로 조회됩니다</p>
+            <p className={m.hint}>* Riot API 키 설정되면 티어가 자동으로 조회됩니다</p>
           </form>
         </div>
 
