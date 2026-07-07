@@ -27,27 +27,24 @@ export async function POST(req: NextRequest) {
   let rank = "";
   let lp = 0;
   let puuid = "";
-  let topChampions: { championId: number; championName: string; championLevel: number; championPoints: number }[] = [];
+  let topChampions: { championId: number; championName: string; championKey: string; championLevel: number; championPoints: number }[] = [];
   let recentWins = 0;
   let recentLosses = 0;
   let riotError: string | null = null;
 
-  // 챔피언 이름 매핑 (champion-mastery API는 championId만 반환하므로 DDragon에서 조회)
-  async function getChampionName(championId: number): Promise<string> {
-    try {
-      const verRes = await fetch("https://ddragon.leagueoflegends.com/api/versions.json");
-      const versions = await verRes.json();
-      const version = versions[0];
-      const champRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/ko_KR/champion.json`);
-      const champData = await champRes.json();
-      const champ = Object.values(champData.data as Record<string, { key: string; name: string }>).find(
-        (c) => Number(c.key) === championId
-      );
-      return champ?.name ?? String(championId);
-    } catch {
-      return String(championId);
+  // DDragon 챔피언 맵 (championId → { name(한국어), key(영문) })
+  type ChampEntry = { key: string; name: string };
+  let champMap: Map<number, { name: string; key: string }> = new Map();
+  try {
+    const verRes = await fetch("https://ddragon.leagueoflegends.com/api/versions.json");
+    const versions = await verRes.json();
+    const version = versions[0];
+    const champRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/ko_KR/champion.json`);
+    const champData = await champRes.json();
+    for (const [engKey, val] of Object.entries(champData.data as Record<string, ChampEntry>)) {
+      champMap.set(Number(val.key), { name: val.name, key: engKey });
     }
-  }
+  } catch { /* DDragon 실패 시 빈 맵으로 진행 */ }
 
   if (RIOT_API_KEY) {
     try {
@@ -91,14 +88,16 @@ export async function POST(req: NextRequest) {
         // 챔피언 마스터리
         if (masteryRes.ok) {
           const masteries = await masteryRes.json();
-          topChampions = await Promise.all(
-            masteries.map(async (m: { championId: number; championLevel: number; championPoints: number }) => ({
+          topChampions = masteries.map((m: { championId: number; championLevel: number; championPoints: number }) => {
+            const info = champMap.get(m.championId);
+            return {
               championId: m.championId,
-              championName: await getChampionName(m.championId),
+              championName: info?.name ?? String(m.championId),
+              championKey: info?.key ?? String(m.championId),
               championLevel: m.championLevel,
               championPoints: m.championPoints,
-            }))
-          );
+            };
+          });
         }
 
         // 최근 솔랭 전적

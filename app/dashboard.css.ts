@@ -75,6 +75,57 @@ export const statSubValue = style({
   color: vars.color.textMuted,
 });
 
+export const leaderboardRow = style({
+  position: "relative",
+  transition: "background-color 0.1s ease",
+  ":hover": { backgroundColor: "var(--color-bgHover, #1e293b)" },
+});
+
+export const champTooltip = style({
+  position: "absolute",
+  top: "calc(100% + 6px)",
+  left: "0",
+  zIndex: 10,
+  display: "none",
+  alignItems: "center",
+  gap: "6px",
+  backgroundColor: "#0f172a",
+  border: "1px solid #1e293b",
+  borderRadius: "8px",
+  padding: "8px 12px",
+  whiteSpace: "nowrap",
+  boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+  selectors: {
+    [`${leaderboardRow}:hover &`]: {
+      display: "flex",
+    },
+  },
+});
+
+export const champIconWrap = style({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: "3px",
+});
+
+export const champIcon = style({
+  width: "36px",
+  height: "36px",
+  borderRadius: "50%",
+  border: "2px solid #334155",
+  objectFit: "cover",
+});
+
+export const champIconName = style({
+  fontSize: "9px",
+  color: "#94a3b8",
+  textAlign: "center",
+  maxWidth: "40px",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+});
+
 export const ingameSection = style({
   marginBottom: vars.space.lg,
 });

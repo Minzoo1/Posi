@@ -4,7 +4,7 @@ import "./styles/global.css";
 import * as s from "./styles/layout.css";
 
 export const metadata: Metadata = {
-  title: "PosiEf - 롤 내전 관리",
+  title: "선한영향력 - 롤 내전 관리",
   description: "League of Legends 내전 팀 뽑기 및 전적 관리 시스템",
 };
 

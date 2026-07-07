@@ -9,28 +9,39 @@ import * as c from "./styles/components.css";
 import * as d from "./dashboard.css";
 import IngameWidget from "./components/IngameWidget";
 
+async function getDDragonVersion(): Promise<string> {
+  try {
+    const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", { next: { revalidate: 86400 } });
+    const versions = await res.json();
+    return versions[0];
+  } catch {
+    return "15.1.1";
+  }
+}
+
 async function getData() {
   try {
     await connectDB();
-    const [players, matches] = await Promise.all([
+    const [players, matches, ddVersion] = await Promise.all([
       Player.find().sort({ elo: -1 }).lean(),
       Match.find().sort({ date: -1 }).limit(5).lean(),
+      getDDragonVersion(),
     ]);
-    return { players, matches };
+    return { players, matches, ddVersion };
   } catch {
-    return { players: [], matches: [] };
+    return { players: [], matches: [], ddVersion: "15.1.1" };
   }
 }
 
 export default async function DashboardPage() {
-  const { players, matches } = await getData();
+  const { players, matches, ddVersion } = await getData();
   const topPlayer = players[0];
 
   return (
     <div>
       <div className={s.pageHeader}>
         <h1 className={s.pageTitle}>대시보드</h1>
-        <p className={s.pageSubtitle}>PosiEf 내전 현황</p>
+        <p className={s.pageSubtitle}>선한영향력 내전 현황</p>
       </div>
 
       <IngameWidget />
@@ -87,14 +98,31 @@ export default async function DashboardPage() {
                 {players.slice(0, 10).map((p, i) => {
                   const total = p.wins + p.losses;
                   const wr = total > 0 ? Math.round((p.wins / total) * 100) : 0;
+                  type Champ = { championId: number; championName: string; championKey: string };
+                  const champs = ((p.topChampions ?? []) as Champ[]).slice(0, 4);
                   return (
-                    <tr key={String(p._id)} className={c.trHover}>
+                    <tr key={String(p._id)} className={d.leaderboardRow}>
                       <td className={`${c.td} ${d.rankNum} ${i < 3 ? c.goldText : c.mutedText}`}>
                         {i + 1}
                       </td>
                       <td className={c.td}>
                         <div className={d.playerName}>{p.name}</div>
                         <div className={d.playerTag}>#{p.tag}</div>
+                        {champs.length > 0 && (
+                          <div className={d.champTooltip}>
+                            {champs.map((ch) => (
+                              <div key={ch.championId} className={d.champIconWrap}>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={`https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/champion/${ch.championKey}.png`}
+                                  alt={ch.championName}
+                                  className={d.champIcon}
+                                />
+                                <span className={d.champIconName}>{ch.championName}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </td>
                       <td className={c.td}>
                         <span style={{ color: c.tierColors[p.tier] ?? "#64748b", fontWeight: "700", fontSize: "12px" }}>

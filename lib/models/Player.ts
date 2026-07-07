@@ -3,6 +3,7 @@ import mongoose, { Schema, model, models } from "mongoose";
 export interface IChampionMastery {
   championId: number;
   championName: string;
+  championKey: string;
   championLevel: number;
   championPoints: number;
 }
@@ -29,6 +30,7 @@ export interface IPlayer {
 const ChampionMasterySchema = new Schema<IChampionMastery>({
   championId: Number,
   championName: String,
+  championKey: { type: String, default: "" },
   championLevel: Number,
   championPoints: Number,
 }, { _id: false });
