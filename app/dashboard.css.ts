@@ -128,7 +128,7 @@ export const champIconName = style({
 
 export const streakGrid = style({
   display: "grid",
-  gridTemplateColumns: "1fr 1.4fr",
+  gridTemplateColumns: "1fr 1fr",
   gap: vars.space.md,
   marginBottom: vars.space.lg,
 });
@@ -154,13 +154,10 @@ export const streakCard = styleVariants({
 
 export const streakTitle = styleVariants({
   win: {
-    fontSize: vars.fontSize.sm,
+    fontSize: vars.fontSize.base,
     fontWeight: "700",
     color: "#22c55e",
-    textTransform: "uppercase" as const,
-    letterSpacing: "1.5px",
     marginBottom: vars.space.md,
-    opacity: 0.9,
   },
   loss: {
     fontSize: vars.fontSize.base,
