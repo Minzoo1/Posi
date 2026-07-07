@@ -70,12 +70,19 @@ export async function POST(req: NextRequest) {
           fetch(`https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?queue=420&count=20`, { headers: { "X-Riot-Token": RIOT_API_KEY } }),
         ]);
 
-        // 랭크
+        // 랭크 (솔로 없으면 자유랭크 fallback)
         if (rankRes.ok) {
           const ranks = await rankRes.json();
           const solo = ranks.find((r: { queueType: string }) => r.queueType === "RANKED_SOLO_5x5");
-          if (solo) { tier = solo.tier; rank = solo.rank; lp = solo.leaguePoints; }
-          else riotError = "솔로랭크 기록 없음 (언랭)";
+          const flex = ranks.find((r: { queueType: string }) => r.queueType === "RANKED_FLEX_SR");
+          if (solo) {
+            tier = solo.tier; rank = solo.rank; lp = solo.leaguePoints;
+          } else if (flex) {
+            tier = flex.tier; rank = flex.rank; lp = flex.leaguePoints;
+            riotError = "솔로랭크 없음 — 자유랭크 티어 적용";
+          } else {
+            riotError = "랭크 기록 없음 (언랭)";
+          }
         } else {
           const errBody = await rankRes.json().catch(() => ({}));
           riotError = `랭크 조회 실패 (${rankRes.status}): ${JSON.stringify(errBody)}`;
