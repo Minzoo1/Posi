@@ -35,6 +35,7 @@ export default function MembersPage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [refreshingId, setRefreshingId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", riotId: "", tag: "", mainPosition: "TOP" });
   const [error, setError] = useState("");
 
@@ -73,6 +74,18 @@ export default function MembersPage() {
     if (!confirm(`${name} 멤버를 삭제할까요?`)) return;
     await fetch(`/api/players/${id}`, { method: "DELETE" });
     fetchPlayers();
+  }
+
+  async function handleRefresh(id: string) {
+    setRefreshingId(id);
+    const res = await fetch(`/api/players/${id}`, { method: "PUT" });
+    const data = await res.json();
+    setRefreshingId(null);
+    if (!res.ok) {
+      alert(data.error ?? "갱신 실패");
+    } else {
+      fetchPlayers();
+    }
   }
 
   return (
@@ -189,12 +202,22 @@ export default function MembersPage() {
                           );
                         })()}
                       </div>
-                      <button
-                        className={`${c.btn} ${c.btnDanger} ${m.smallBtn}`}
-                        onClick={() => handleDelete(p._id, p.name)}
-                      >
-                        삭제
-                      </button>
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <button
+                          className={`${c.btn} ${c.btnGhost} ${m.smallBtn}`}
+                          onClick={() => handleRefresh(p._id)}
+                          disabled={refreshingId === p._id}
+                          title="티어 갱신"
+                        >
+                          {refreshingId === p._id ? "갱신 중..." : "티어 갱신"}
+                        </button>
+                        <button
+                          className={`${c.btn} ${c.btnDanger} ${m.smallBtn}`}
+                          onClick={() => handleDelete(p._id, p.name)}
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
