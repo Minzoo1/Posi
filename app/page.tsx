@@ -9,12 +9,16 @@ import * as c from "./styles/components.css";
 import * as d from "./dashboard.css";
 
 async function getData() {
-  await connectDB();
-  const [players, matches] = await Promise.all([
-    Player.find().sort({ elo: -1 }).lean(),
-    Match.find().sort({ date: -1 }).limit(5).lean(),
-  ]);
-  return { players, matches };
+  try {
+    await connectDB();
+    const [players, matches] = await Promise.all([
+      Player.find().sort({ elo: -1 }).lean(),
+      Match.find().sort({ date: -1 }).limit(5).lean(),
+    ]);
+    return { players, matches };
+  } catch {
+    return { players: [], matches: [] };
+  }
 }
 
 export default async function DashboardPage() {

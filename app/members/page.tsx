@@ -50,6 +50,9 @@ export default function MembersPage() {
     if (!res.ok) {
       setError(data.error || "오류가 발생했습니다.");
     } else {
+      if (data._riotError) {
+        setError(`등록 완료 (티어 조회 실패: ${data._riotError})`);
+      }
       setForm({ name: "", riotId: "", tag: "", mainPosition: "TOP" });
       fetchPlayers();
     }
