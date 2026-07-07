@@ -164,9 +164,14 @@ export default function MembersPage() {
                         {p.topChampions?.length > 0 && (
                           <div className={m.champRow}>
                             {p.topChampions.map((ch) => (
-                              <span key={ch.championId} className={m.champBadge} title={`${ch.championPoints.toLocaleString()}점`}>
-                                {ch.championName}
-                              </span>
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                key={ch.championId}
+                                src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${ch.championId}.jpg`}
+                                alt={ch.championName}
+                                title={`${ch.championName} (${ch.championPoints.toLocaleString()}점)`}
+                                className={m.champIcon}
+                              />
                             ))}
                           </div>
                         )}

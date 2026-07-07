@@ -114,7 +114,7 @@ export default async function DashboardPage() {
                               <div key={ch.championId} className={d.champIconWrap}>
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
-                                  src={`https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/champion/${ch.championKey}.png`}
+                                  src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${ch.championId}.jpg`}
                                   alt={ch.championName}
                                   className={d.champIcon}
                                 />
