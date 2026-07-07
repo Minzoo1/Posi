@@ -98,31 +98,14 @@ export default async function DashboardPage() {
                 {players.slice(0, 10).map((p, i) => {
                   const total = p.wins + p.losses;
                   const wr = total > 0 ? Math.round((p.wins / total) * 100) : 0;
-                  type Champ = { championId: number; championName: string; championKey: string };
-                  const champs = ((p.topChampions ?? []) as Champ[]).slice(0, 4);
                   return (
-                    <tr key={String(p._id)} className={d.leaderboardRow}>
+                    <tr key={String(p._id)} className={c.trHover}>
                       <td className={`${c.td} ${d.rankNum} ${i < 3 ? c.goldText : c.mutedText}`}>
                         {i + 1}
                       </td>
                       <td className={c.td}>
                         <div className={d.playerName}>{p.name}</div>
                         <div className={d.playerTag}>#{p.tag}</div>
-                        {champs.length > 0 && (
-                          <div className={d.champTooltip}>
-                            {champs.map((ch) => (
-                              <div key={ch.championId} className={d.champIconWrap}>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${ch.championId}.jpg`}
-                                  alt={ch.championName}
-                                  className={d.champIcon}
-                                />
-                                <span className={d.champIconName}>{ch.championName}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </td>
                       <td className={c.td}>
                         <span style={{ color: c.tierColors[p.tier] ?? "#64748b", fontWeight: "700", fontSize: "12px" }}>

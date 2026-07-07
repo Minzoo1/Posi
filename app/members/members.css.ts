@@ -109,11 +109,12 @@ export const champRow = style({
   flexWrap: "wrap",
 });
 
-export const champIcon = style({
-  width: "24px",
-  height: "24px",
-  borderRadius: "50%",
-  border: `1px solid ${vars.color.border}`,
-  objectFit: "cover",
+export const champBadge = style({
+  fontSize: "10px",
+  padding: `1px 6px`,
+  borderRadius: vars.radius.full,
+  backgroundColor: `${vars.color.primary}18`,
+  color: vars.color.primary,
+  fontWeight: "600",
   cursor: "default",
 });

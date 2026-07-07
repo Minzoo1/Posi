@@ -28,3 +28,14 @@ export const emptyState = style({
   padding: `${vars.space["2xl"]} 0`,
   color: vars.color.textMuted,
 });
+
+export const clickableRow = style({
+  cursor: "pointer",
+});
+
+export const playerLink = style({
+  display: "block",
+  color: "inherit",
+  textDecoration: "none",
+  ":hover": { color: vars.color.primary },
+});

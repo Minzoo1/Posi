@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import Link from "next/link";
 import { connectDB } from "@/lib/db";
 import { Player } from "@/lib/models/Player";
 import * as s from "../styles/layout.css";
@@ -40,13 +41,15 @@ export default async function PlayersPage() {
               const wr = total > 0 ? Math.round((pl.wins / total) * 100) : 0;
               const medal = String(i + 1);
               return (
-                <tr key={String(pl._id)} className={c.trHover}>
+                <tr key={String(pl._id)} className={`${c.trHover} ${p.clickableRow}`}>
                   <td className={`${c.td} ${p.rankCell} ${i < 3 ? c.goldText : c.mutedText}`}>
                     {medal}
                   </td>
                   <td className={c.td}>
-                    <div className={p.playerName}>{pl.name}</div>
-                    <div className={p.playerSub}>{pl.riotId}#{pl.tag}</div>
+                    <Link href={`/players/${String(pl._id)}`} className={p.playerLink}>
+                      <div className={p.playerName}>{pl.name}</div>
+                      <div className={p.playerSub}>{pl.riotId}#{pl.tag}</div>
+                    </Link>
                   </td>
                   <td className={c.td}>
                     <span className={c.positionBadge}>{pl.mainPosition.slice(0, 3)}</span>
