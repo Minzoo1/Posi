@@ -22,6 +22,8 @@ const navItems = [
     group: "통계",
     items: [
       { href: "/players", label: "플레이어 통계" },
+      { href: "/hall-of-fame", label: "명예의 전당" },
+      { href: "/fun-stats", label: "패배의 원인" },
     ],
   },
   {
@@ -39,7 +41,7 @@ export default function Sidebar() {
   return (
     <aside className={s.sidebar}>
       <div className={s.sidebarLogo}>
-        <span className={s.logoText}>PosiEf</span>
+        <span className={s.logoText}>선한영향력</span>
       </div>
       <nav className={s.sidebarNav}>
         {navItems.map((group) => (

@@ -34,6 +34,30 @@ export default async function PlayerDetailPage({ params }: { params: Promise<{ i
   const recentTotal = (player.recentWins ?? 0) + (player.recentLosses ?? 0);
   const recentWr = recentTotal > 0 ? Math.round(((player.recentWins ?? 0) / recentTotal) * 100) : 0;
 
+  const kdaMatches = matches.filter((m) =>
+    m.participants.some(
+      (pt: { playerId: mongoose.Types.ObjectId; kills?: number; deaths?: number; assists?: number }) =>
+        String(pt.playerId) === id && pt.kills != null
+    )
+  );
+  const kdaTotals = kdaMatches.reduce(
+    (acc, m) => {
+      const pt = m.participants.find(
+        (p: { playerId: mongoose.Types.ObjectId; kills?: number; deaths?: number; assists?: number }) =>
+          String(p.playerId) === id
+      );
+      return { k: acc.k + (pt?.kills ?? 0), d: acc.d + (pt?.deaths ?? 0), a: acc.a + (pt?.assists ?? 0) };
+    },
+    { k: 0, d: 0, a: 0 }
+  );
+  const kdaCount = kdaMatches.length;
+  const avgK = kdaCount > 0 ? (kdaTotals.k / kdaCount).toFixed(1) : null;
+  const avgD = kdaCount > 0 ? (kdaTotals.d / kdaCount).toFixed(1) : null;
+  const avgA = kdaCount > 0 ? (kdaTotals.a / kdaCount).toFixed(1) : null;
+  const kdaRatio = kdaCount > 0 && kdaTotals.d > 0
+    ? ((kdaTotals.k + kdaTotals.a) / kdaTotals.d).toFixed(2)
+    : kdaCount > 0 ? "Perfect" : null;
+
   return (
     <div>
       <Link href="/players" className={pd.backLink}>← 플레이어 통계로 돌아가기</Link>
@@ -86,6 +110,15 @@ export default async function PlayerDetailPage({ params }: { params: Promise<{ i
           <div className={pd.statLabel}>내전 경기수</div>
           <div className={pd.statValue}>{total}</div>
           <div className={pd.statSub}>판</div>
+        </div>
+        <div className={pd.statBox}>
+          <div className={pd.statLabel}>평균 KDA</div>
+          <div className={pd.statValue} style={{ color: kdaRatio && kdaRatio !== "Perfect" && parseFloat(kdaRatio) >= 3 ? "#22c55e" : undefined }}>
+            {kdaRatio ?? "-"}
+          </div>
+          {avgK != null && (
+            <div className={pd.statSub}>{avgK} / {avgD} / {avgA}</div>
+          )}
         </div>
       </div>
 

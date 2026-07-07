@@ -1,19 +1,49 @@
-export const dynamic = "force-dynamic";
+"use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { connectDB } from "@/lib/db";
-import { Match } from "@/lib/models/Match";
 import * as s from "../styles/layout.css";
 import * as c from "../styles/components.css";
 import * as m from "./matches.css";
 
-async function getMatches() {
-  await connectDB();
-  return Match.find().sort({ date: -1 }).lean();
+interface Participant {
+  team: string;
+  playerName: string;
+  champion: string;
 }
 
-export default async function MatchesPage() {
-  const matches = await getMatches();
+interface Match {
+  _id: string;
+  date: string;
+  duration: number;
+  winner: "blue" | "red";
+  blueTeamName: string;
+  redTeamName: string;
+  note: string;
+  participants: Participant[];
+}
+
+export default function MatchesPage() {
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function fetchMatches() {
+    const res = await fetch("/api/matches");
+    const data = await res.json();
+    setMatches(data);
+    setLoading(false);
+  }
+
+  useEffect(() => { fetchMatches(); }, []);
+
+  async function handleDelete(id: string) {
+    if (!confirm("이 경기를 삭제할까요?\nELO와 승패 기록이 모두 되돌아갑니다.")) return;
+    setDeletingId(id);
+    await fetch(`/api/matches/${id}`, { method: "DELETE" });
+    setDeletingId(null);
+    fetchMatches();
+  }
 
   return (
     <div>
@@ -28,7 +58,9 @@ export default async function MatchesPage() {
       </div>
 
       <div className={s.card}>
-        {matches.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "48px 0" }}><div className={c.spinner} /></div>
+        ) : matches.length === 0 ? (
           <div className={m.emptyState}>
             <p className={m.emptyText}>아직 경기 기록이 없습니다</p>
             <Link href="/matches/new">
@@ -43,11 +75,11 @@ export default async function MatchesPage() {
               });
               const mins = Math.floor(match.duration / 60);
               const secs = match.duration % 60;
-              const blueParticipants = match.participants.filter((p: { team: string }) => p.team === "blue");
-              const redParticipants = match.participants.filter((p: { team: string }) => p.team === "red");
+              const blueParticipants = match.participants.filter((p) => p.team === "blue");
+              const redParticipants = match.participants.filter((p) => p.team === "red");
 
               return (
-                <div key={String(match._id)} className={m.matchCard}>
+                <div key={match._id} className={m.matchCard}>
                   <div className={m.matchCardInner}>
                     <div>
                       <div className={m.matchTitle}>
@@ -68,6 +100,14 @@ export default async function MatchesPage() {
                       <span className={`${c.badge} ${c.badgeVariant[match.winner === "blue" ? "win" : "loss"]} ${m.bigBadge}`}>
                         {match.winner === "blue" ? match.blueTeamName : match.redTeamName} 승리
                       </span>
+                      <button
+                        className={`${c.btn} ${c.btnDanger}`}
+                        style={{ fontSize: "12px", padding: "4px 10px" }}
+                        onClick={() => handleDelete(match._id)}
+                        disabled={deletingId === match._id}
+                      >
+                        {deletingId === match._id ? "삭제 중..." : "삭제"}
+                      </button>
                     </div>
                   </div>
 
@@ -75,8 +115,8 @@ export default async function MatchesPage() {
                     <div className={m.participantRow}>
                       {(["blue", "red"] as const).map((team) =>
                         match.participants
-                          .filter((p: { team: string }) => p.team === team)
-                          .map((p: { playerName: string; champion: string }, i: number) => (
+                          .filter((p) => p.team === team)
+                          .map((p, i) => (
                             <span
                               key={`${team}-${i}`}
                               className={`${m.participantChip} ${team === "blue" ? m.blueChip : m.redChip}`}
