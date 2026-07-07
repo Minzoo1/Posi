@@ -28,7 +28,7 @@ function balanceTeams(selected: Player[]): Team {
   return { blue, red };
 }
 
-const POSITIONS = ["TOP", "JGL", "MID", "BOT", "SUP"];
+const POSITIONS = ["TOP", "JG", "MID", "AD", "SUP"];
 
 export default function TeamBuilderPage() {
   const [players, setPlayers] = useState<Player[]>([]);
