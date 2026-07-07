@@ -84,36 +84,6 @@ export default async function DashboardPage() {
 
       <IngameWidget />
 
-      {(winStreaks.length > 0 || lossStreaks.length > 0) && (
-        <div className={d.streakGrid}>
-          <div className={d.streakCard.win}>
-            <div className={d.streakTitle.win}>🔥 연승 중</div>
-            {winStreaks.length === 0 ? (
-              <p className={d.streakEmpty}>해당 없음</p>
-            ) : winStreaks.map((p) => (
-              <div key={p.name} className={d.streakRow.win}>
-                <span className={d.streakName}>{p.name}</span>
-                <span className={d.streakBadge.win}>{p.streak}연승</span>
-              </div>
-            ))}
-          </div>
-          <div className={d.streakCard.loss}>
-            <div className={d.streakTitle.loss}>패배의 요인</div>
-            {lossStreaks.length === 0 ? (
-              <p className={d.streakEmpty}>해당 없음</p>
-            ) : lossStreaks.map((p) => (
-              <div key={p.name} className={d.streakRow.loss}>
-                <span className={d.streakLossName}>{p.name}</span>
-                <div style={{ textAlign: "right" }}>
-                  <div className={d.streakBadge.loss}>{p.streak}</div>
-                  <div className={d.streakLossSub}>연패 중</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       <div className={s.grid4} style={{ marginBottom: "24px" }}>
         <div className={c.statCard}>
           <div className={c.statLabel}>총 멤버</div>
@@ -201,7 +171,21 @@ export default async function DashboardPage() {
         </div>
 
         <div className={s.card}>
-          <h2 className={d.sectionTitle}>최근 경기</h2>
+          <div className={d.recentMatchHeader}>
+            <h2 className={d.sectionTitle} style={{ marginBottom: 0 }}>최근 경기</h2>
+            <div className={d.streakPills}>
+              {winStreaks.slice(0, 2).map((p) => (
+                <span key={p.name} className={d.streakPill.win}>
+                  🔥 {p.name} {p.streak}연승
+                </span>
+              ))}
+              {lossStreaks.slice(0, 2).map((p) => (
+                <span key={p.name} className={d.streakPill.loss}>
+                  {p.name} {p.streak}연패
+                </span>
+              ))}
+            </div>
+          </div>
           {matches.length === 0 ? (
             <p className={d.emptyState}>경기 기록이 없습니다</p>
           ) : (
