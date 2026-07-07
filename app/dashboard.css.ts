@@ -157,9 +157,9 @@ export const streakPill = styleVariants({
     backgroundColor: "#22c55e15",
     color: "#22c55e",
     border: "1px solid #22c55e35",
-    whiteSpace: "nowrap" as const,
-    lineHeight: "1.4",
-    minWidth: "110px",
+    lineHeight: "1.6",
+    minWidth: "120px",
+    textAlign: "center" as const,
   },
   loss: {
     display: "inline-flex",
