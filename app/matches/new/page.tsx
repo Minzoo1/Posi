@@ -20,10 +20,10 @@ interface Participant {
   team: "blue" | "red";
   champion: string;
   position: string;
-  kills: number;
-  deaths: number;
-  assists: number;
-  cs: number;
+  kills: string;
+  deaths: string;
+  assists: string;
+  cs: string;
   elo: number;
 }
 
@@ -32,10 +32,10 @@ const EMPTY_PARTICIPANT: Omit<Participant, "playerId" | "playerName" | "elo"> = 
   team: "blue",
   champion: "",
   position: "",
-  kills: 0,
-  deaths: 0,
-  assists: 0,
-  cs: 0,
+  kills: "",
+  deaths: "",
+  assists: "",
+  cs: "",
 };
 
 export default function NewMatchPage() {
@@ -62,12 +62,12 @@ export default function NewMatchPage() {
     ]);
   }
 
-  function updateParticipant(idx: number, field: string, value: string | number) {
+  function updateParticipant(idx: number, field: string, value: string) {
     setParticipants((prev) => {
       const next = [...prev];
       if (field === "playerId") {
         const player = players.find((p) => p._id === value);
-        next[idx] = { ...next[idx], playerId: String(value), playerName: player?.name ?? "", elo: player?.elo ?? 1000 };
+        next[idx] = { ...next[idx], playerId: value, playerName: player?.name ?? "", elo: player?.elo ?? 1000 };
       } else {
         (next[idx] as unknown as Record<string, unknown>)[field] = value;
       }
@@ -88,10 +88,17 @@ export default function NewMatchPage() {
     }
     setSubmitting(true);
     const durationSecs = duration ? parseInt(duration) * 60 : 0;
+    const parsedParticipants = participants.map((p) => ({
+      ...p,
+      kills: parseInt(p.kills) || 0,
+      deaths: parseInt(p.deaths) || 0,
+      assists: parseInt(p.assists) || 0,
+      cs: parseInt(p.cs) || 0,
+    }));
     const res = await fetch("/api/matches", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ winner, duration: durationSecs, blueTeamName, redTeamName, note, participants }),
+      body: JSON.stringify({ winner, duration: durationSecs, blueTeamName, redTeamName, note, participants: parsedParticipants }),
     });
     if (res.ok) {
       router.push("/matches");
@@ -196,10 +203,10 @@ export default function NewMatchPage() {
                         ))}
                       </select>
                       <input className={c.input} placeholder="챔피언" value={p.champion} onChange={(e) => updateParticipant(i, "champion", e.target.value)} style={{ fontSize: "13px" }} />
-                      <input className={c.input} type="number" placeholder="K" min={0} value={p.kills} onChange={(e) => updateParticipant(i, "kills", parseInt(e.target.value) || 0)} style={{ textAlign: "center" }} />
-                      <input className={c.input} type="number" placeholder="D" min={0} value={p.deaths} onChange={(e) => updateParticipant(i, "deaths", parseInt(e.target.value) || 0)} style={{ textAlign: "center" }} />
-                      <input className={c.input} type="number" placeholder="A" min={0} value={p.assists} onChange={(e) => updateParticipant(i, "assists", parseInt(e.target.value) || 0)} style={{ textAlign: "center" }} />
-                      <input className={c.input} type="number" placeholder="CS" min={0} value={p.cs} onChange={(e) => updateParticipant(i, "cs", parseInt(e.target.value) || 0)} style={{ textAlign: "center" }} />
+                      <input className={c.input} type="number" placeholder="K" min={0} value={p.kills} onChange={(e) => updateParticipant(i, "kills", e.target.value)} style={{ textAlign: "center" }} />
+                      <input className={c.input} type="number" placeholder="D" min={0} value={p.deaths} onChange={(e) => updateParticipant(i, "deaths", e.target.value)} style={{ textAlign: "center" }} />
+                      <input className={c.input} type="number" placeholder="A" min={0} value={p.assists} onChange={(e) => updateParticipant(i, "assists", e.target.value)} style={{ textAlign: "center" }} />
+                      <input className={c.input} type="number" placeholder="CS" min={0} value={p.cs} onChange={(e) => updateParticipant(i, "cs", e.target.value)} style={{ textAlign: "center" }} />
                       <button type="button" className={`${c.btn} ${c.btnDanger}`} style={{ padding: "6px 8px", fontSize: "12px" }} onClick={() => removeParticipant(i)}>✕</button>
                     </div>
                   ))}
