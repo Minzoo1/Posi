@@ -146,7 +146,7 @@ export const streakPills = style({
 
 export const streakPill = styleVariants({
   win: {
-    display: "inline-flex",
+    display: "flex",
     flexDirection: "column" as const,
     alignItems: "center",
     justifyContent: "center",
@@ -162,7 +162,7 @@ export const streakPill = styleVariants({
     textAlign: "center" as const,
   },
   loss: {
-    display: "inline-flex",
+    display: "flex",
     flexDirection: "column" as const,
     alignItems: "center",
     justifyContent: "center",
