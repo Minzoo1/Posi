@@ -176,12 +176,12 @@ export default async function DashboardPage() {
             <div className={d.streakPills}>
               {winStreaks.slice(0, 2).map((p) => (
                 <span key={p.name} className={d.streakPill.win}>
-                  {p.name}<br />🔥 {p.streak}연승중
+                  {p.name}님은<br />🔥 {p.streak}연승중입니다!
                 </span>
               ))}
               {lossStreaks.slice(0, 2).map((p) => (
                 <span key={p.name} className={d.streakPill.loss}>
-                  {p.name}<br />▼ {p.streak}연패중
+                  {p.name}님은<br />▼ {p.streak}연패 중이에양...
                 </span>
               ))}
             </div>
