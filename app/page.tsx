@@ -181,7 +181,7 @@ export default async function DashboardPage() {
               ))}
               {lossStreaks.slice(0, 2).map((p) => (
                 <span key={p.name} className={d.streakPill.loss}>
-                  📉 {p.name} {p.streak}연패
+                  🤡 {p.name} {p.streak}연패
                 </span>
               ))}
             </div>
