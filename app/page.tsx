@@ -87,7 +87,7 @@ export default async function DashboardPage() {
       {(winStreaks.length > 0 || lossStreaks.length > 0) && (
         <div className={d.streakGrid}>
           <div className={d.streakCard.win}>
-            <div className={d.streakTitle.win}>연승 중</div>
+            <div className={d.streakTitle.win}>Hot Streak</div>
             {winStreaks.length === 0 ? (
               <p className={d.streakEmpty}>해당 없음</p>
             ) : winStreaks.map((p) => (
@@ -98,13 +98,16 @@ export default async function DashboardPage() {
             ))}
           </div>
           <div className={d.streakCard.loss}>
-            <div className={d.streakTitle.loss}>연패 중</div>
+            <div className={d.streakTitle.loss}>패배의 굴레</div>
             {lossStreaks.length === 0 ? (
               <p className={d.streakEmpty}>해당 없음</p>
             ) : lossStreaks.map((p) => (
               <div key={p.name} className={d.streakRow.loss}>
-                <span className={d.streakName}>{p.name}</span>
-                <span className={d.streakBadge.loss}>{p.streak}연패</span>
+                <span className={d.streakLossName}>{p.name}</span>
+                <div style={{ textAlign: "right" }}>
+                  <div className={d.streakBadge.loss}>{p.streak}</div>
+                  <div className={d.streakLossSub}>연패 중</div>
+                </div>
               </div>
             ))}
           </div>
