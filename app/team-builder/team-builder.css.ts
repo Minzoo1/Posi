@@ -224,3 +224,63 @@ export const smallBtn = style({
   padding: `4px 12px`,
   fontSize: vars.fontSize.xs,
 });
+
+export const modeTab = styleVariants({
+  active: {
+    padding: `6px 20px`,
+    borderRadius: vars.radius.md,
+    fontSize: vars.fontSize.sm,
+    fontWeight: "700",
+    cursor: "pointer",
+    border: "none",
+    backgroundColor: vars.color.primary,
+    color: vars.color.text,
+  },
+  inactive: {
+    padding: `6px 20px`,
+    borderRadius: vars.radius.md,
+    fontSize: vars.fontSize.sm,
+    fontWeight: "600",
+    cursor: "pointer",
+    border: `1px solid ${vars.color.border}`,
+    backgroundColor: "transparent",
+    color: vars.color.textSecondary,
+    ":hover": { backgroundColor: vars.color.bgHover },
+  },
+});
+
+export const modeTabs = style({
+  display: "flex",
+  gap: vars.space.sm,
+  marginBottom: vars.space.lg,
+});
+
+export const sizeTabRow = style({
+  display: "flex",
+  gap: vars.space.sm,
+  marginBottom: vars.space.md,
+});
+
+export const sizeTab = styleVariants({
+  active: {
+    padding: `4px 14px`,
+    borderRadius: vars.radius.md,
+    fontSize: vars.fontSize.sm,
+    fontWeight: "700",
+    cursor: "pointer",
+    border: `2px solid ${vars.color.primary}`,
+    backgroundColor: `${vars.color.primary}22`,
+    color: vars.color.primary,
+  },
+  inactive: {
+    padding: `4px 14px`,
+    borderRadius: vars.radius.md,
+    fontSize: vars.fontSize.sm,
+    fontWeight: "600",
+    cursor: "pointer",
+    border: `1px solid ${vars.color.border}`,
+    backgroundColor: "transparent",
+    color: vars.color.textSecondary,
+    ":hover": { backgroundColor: vars.color.bgHover },
+  },
+});
