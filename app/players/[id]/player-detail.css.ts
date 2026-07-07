@@ -45,6 +45,11 @@ export const statGrid = style({
   gridTemplateColumns: "repeat(4, 1fr)",
   gap: vars.space.md,
   marginBottom: vars.space.lg,
+  "@media": {
+    "screen and (max-width: 768px)": {
+      gridTemplateColumns: "repeat(2, 1fr)",
+    },
+  },
 });
 
 export const statBox = style({

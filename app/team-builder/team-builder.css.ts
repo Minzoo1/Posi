@@ -261,6 +261,49 @@ export const sizeTabRow = style({
   marginBottom: vars.space.md,
 });
 
+export const spectatorResult = style({
+  display: "flex",
+  flexDirection: "column" as const,
+  alignItems: "center",
+  gap: vars.space.md,
+  padding: vars.space.xl,
+  backgroundColor: vars.color.bg,
+  borderRadius: vars.radius.lg,
+  border: `2px solid ${vars.color.primary}44`,
+  marginBottom: vars.space.md,
+});
+
+export const spectatorAvatar = style({
+  width: "80px",
+  height: "80px",
+  borderRadius: "50%",
+  backgroundColor: `${vars.color.primary}22`,
+  border: `3px solid ${vars.color.primary}66`,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "32px",
+  fontWeight: "800",
+  color: vars.color.primary,
+});
+
+export const spectatorName = style({
+  fontSize: vars.fontSize["2xl"],
+  fontWeight: "800",
+  color: vars.color.text,
+});
+
+export const spectatorSub = style({
+  fontSize: vars.fontSize.base,
+  color: vars.color.textMuted,
+});
+
+export const spectatorActions = style({
+  display: "flex",
+  gap: vars.space.md,
+  marginTop: vars.space.sm,
+});
+
 export const sizeTab = styleVariants({
   active: {
     padding: `4px 14px`,

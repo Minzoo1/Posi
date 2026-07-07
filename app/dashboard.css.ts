@@ -133,6 +133,11 @@ export const recentMatchHeader = style({
   gap: vars.space.md,
   marginBottom: vars.space.md,
   flexWrap: "wrap" as const,
+  "@media": {
+    "screen and (max-width: 768px)": {
+      flexDirection: "column" as const,
+    },
+  },
 });
 
 export const streakPills = style({

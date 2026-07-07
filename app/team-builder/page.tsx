@@ -17,7 +17,7 @@ interface Team { blue: Player[]; red: Player[] }
 
 const POSITIONS = ["TOP", "JG", "MID", "AD", "SUP"];
 
-type Mode = "elo" | "random";
+type Mode = "elo" | "random" | "spectator";
 type TeamSize = 3 | 4 | 5;
 
 function balanceByElo(selected: Player[]): Team {
@@ -46,8 +46,9 @@ export default function TeamBuilderPage() {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<Mode>("elo");
   const [teamSize, setTeamSize] = useState<TeamSize>(5);
+  const [spectator, setSpectator] = useState<Player | null>(null);
 
-  const needed = mode === "elo" ? 10 : teamSize * 2;
+  const needed = mode === "elo" ? 10 : mode === "spectator" ? players.length : teamSize * 2;
 
   useEffect(() => {
     fetch("/api/players").then((r) => r.json()).then((d) => { setPlayers(d); setLoading(false); });
@@ -67,6 +68,13 @@ export default function TeamBuilderPage() {
     setMode(m);
     setSelected(new Set());
     setTeams(null);
+    setSpectator(null);
+  }
+
+  function pickSpectator() {
+    const pool = players.length > 0 ? players : [];
+    if (pool.length === 0) return;
+    setSpectator(pool[Math.floor(Math.random() * pool.length)]);
   }
 
   function handleSizeChange(size: TeamSize) {
@@ -100,9 +108,48 @@ export default function TeamBuilderPage() {
         <button className={t.modeTab[mode === "random" ? "active" : "inactive"]} onClick={() => handleModeChange("random")}>
           증칼용 무작위
         </button>
+        <button className={t.modeTab[mode === "spectator" ? "active" : "inactive"]} onClick={() => handleModeChange("spectator")}>
+          🪑 관전자 뽑기
+        </button>
       </div>
 
-      <div className={s.grid2} style={{ alignItems: "start" }}>
+      {/* 관전자 뽑기 모드 */}
+      {mode === "spectator" && (
+        <div className={s.card} style={{ maxWidth: "480px", margin: "0 auto", textAlign: "center" }}>
+          <div style={{ fontSize: "48px", marginBottom: "16px" }}>🪑</div>
+          <h2 style={{ fontSize: "20px", fontWeight: "800", marginBottom: "8px" }}>착한병 방지 관전자 뽑기</h2>
+          <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "32px" }}>
+            등록된 멤버 {players.length}명 중 1명을 랜덤으로 뽑아 이번 판은 관전 or 한판 쉬기!
+          </p>
+
+          {loading ? (
+            <div className={t.centerLoader}><div className={c.spinner} /></div>
+          ) : players.length === 0 ? (
+            <p className={t.emptyState}>멤버를 먼저 등록해주세요</p>
+          ) : (
+            <>
+              {spectator ? (
+                <div className={t.spectatorResult}>
+                  <div className={t.spectatorAvatar}>{spectator.name[0]}</div>
+                  <div className={t.spectatorName}>{spectator.name}</div>
+                  <div className={t.spectatorSub}>이번 판은 쉬어가세요 👋</div>
+                  <div className={t.spectatorActions}>
+                    <button className={`${c.btn} ${c.btnGhost}`} onClick={pickSpectator}>
+                      다시 뽑기
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button className={`${c.btn} ${c.btnPrimary}`} style={{ width: "100%", padding: "14px", fontSize: "16px" }} onClick={pickSpectator}>
+                  관전자 뽑기 🎲
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      <div className={s.grid2} style={{ alignItems: "start", display: mode === "spectator" ? "none" : undefined }}>
         <div className={s.card}>
           {mode === "random" && (
             <div className={t.sizeTabRow}>

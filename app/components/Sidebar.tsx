@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import * as s from "../styles/layout.css";
 
 const navItems = [
@@ -37,9 +38,19 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
-  return (
-    <aside className={s.sidebar}>
+  // 라우트 이동 시 닫기
+  useEffect(() => { setOpen(false); }, [pathname]);
+
+  // 스크롤 잠금
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  const navContent = (
+    <>
       <div className={s.sidebarLogo}>
         <span className={s.logoText}>선한영향력</span>
       </div>
@@ -65,6 +76,28 @@ export default function Sidebar() {
           </div>
         ))}
       </nav>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* 모바일 상단 헤더 */}
+      <div className={s.mobileHeader}>
+        <button className={s.hamburger} onClick={() => setOpen(true)} aria-label="메뉴 열기">
+          <span className={s.hamburgerLine} />
+          <span className={s.hamburgerLine} />
+          <span className={s.hamburgerLine} />
+        </button>
+        <span className={s.mobileLogoText}>선한영향력</span>
+      </div>
+
+      {/* 오버레이 (모바일 메뉴 열렸을 때 배경) */}
+      {open && <div className={s.overlay} onClick={() => setOpen(false)} />}
+
+      {/* 사이드바 */}
+      <aside className={`${s.sidebar} ${open ? s.sidebarOpen : ""}`}>
+        {navContent}
+      </aside>
+    </>
   );
 }

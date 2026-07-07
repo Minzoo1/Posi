@@ -24,6 +24,8 @@ export const matchCardInner = style({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  gap: "8px",
+  flexWrap: "wrap" as const,
 });
 
 export const matchTitle = style({
@@ -44,7 +46,8 @@ export const matchMeta = style({
 export const matchRight = style({
   display: "flex",
   alignItems: "center",
-  gap: vars.space.md,
+  gap: vars.space.sm,
+  flexWrap: "wrap" as const,
 });
 
 export const vsLabel = style({
