@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { style, styleVariants } from "@vanilla-extract/css";
 import { vars } from "./styles/theme.css";
 
 export const quickActions = style({
@@ -124,6 +124,84 @@ export const champIconName = style({
   maxWidth: "40px",
   overflow: "hidden",
   textOverflow: "ellipsis",
+});
+
+export const streakGrid = style({
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: vars.space.md,
+  marginBottom: vars.space.lg,
+});
+
+export const streakCard = styleVariants({
+  win: {
+    backgroundColor: vars.color.bgCard,
+    border: `1px solid ${"#22c55e"}33`,
+    borderRadius: vars.radius.lg,
+    padding: vars.space.lg,
+  },
+  loss: {
+    backgroundColor: vars.color.bgCard,
+    border: `1px solid ${"#ef4444"}33`,
+    borderRadius: vars.radius.lg,
+    padding: vars.space.lg,
+  },
+});
+
+export const streakTitle = styleVariants({
+  win: {
+    fontSize: vars.fontSize.base,
+    fontWeight: "700",
+    color: "#22c55e",
+    marginBottom: vars.space.sm,
+  },
+  loss: {
+    fontSize: vars.fontSize.base,
+    fontWeight: "700",
+    color: "#ef4444",
+    marginBottom: vars.space.sm,
+  },
+});
+
+export const streakRow = style({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: `7px 10px`,
+  borderRadius: vars.radius.sm,
+  marginBottom: "4px",
+  backgroundColor: vars.color.bg,
+});
+
+export const streakName = style({
+  fontWeight: "600",
+  fontSize: vars.fontSize.sm,
+});
+
+export const streakBadge = styleVariants({
+  win: {
+    fontSize: vars.fontSize.xs,
+    fontWeight: "800",
+    padding: `2px 8px`,
+    borderRadius: vars.radius.full,
+    backgroundColor: `${"#22c55e"}22`,
+    color: "#22c55e",
+  },
+  loss: {
+    fontSize: vars.fontSize.xs,
+    fontWeight: "800",
+    padding: `2px 8px`,
+    borderRadius: vars.radius.full,
+    backgroundColor: `${"#ef4444"}22`,
+    color: "#ef4444",
+  },
+});
+
+export const streakEmpty = style({
+  fontSize: vars.fontSize.sm,
+  color: vars.color.textMuted,
+  textAlign: "center",
+  padding: `${vars.space.sm} 0`,
 });
 
 export const ingameSection = style({

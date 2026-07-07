@@ -19,22 +19,60 @@ async function getDDragonVersion(): Promise<string> {
   }
 }
 
+interface StreakPlayer { name: string; streak: number }
+
+function calcStreaks(players: { _id: unknown; name: string }[], allMatches: { winner: string; participants: { playerId: unknown; team: string }[] }[]) {
+  const winStreaks: StreakPlayer[] = [];
+  const lossStreaks: StreakPlayer[] = [];
+
+  for (const player of players) {
+    const pid = String(player._id);
+    let streak = 0;
+    let streakType: "win" | "loss" | null = null;
+
+    for (const match of allMatches) {
+      const pt = match.participants.find((p) => String(p.playerId) === pid);
+      if (!pt) continue;
+      const won = pt.team === match.winner;
+      if (streakType === null) {
+        streakType = won ? "win" : "loss";
+        streak = 1;
+      } else if ((streakType === "win") === won) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
+    if (streak >= 3) {
+      if (streakType === "win") winStreaks.push({ name: player.name, streak });
+      else lossStreaks.push({ name: player.name, streak });
+    }
+  }
+
+  winStreaks.sort((a, b) => b.streak - a.streak);
+  lossStreaks.sort((a, b) => b.streak - a.streak);
+  return { winStreaks, lossStreaks };
+}
+
 async function getData() {
   try {
     await connectDB();
-    const [players, matches, ddVersion] = await Promise.all([
+    const [players, recentMatches, allMatches, ddVersion] = await Promise.all([
       Player.find().sort({ elo: -1 }).lean(),
       Match.find().sort({ date: -1 }).limit(5).lean(),
+      Match.find().sort({ date: -1 }).lean(),
       getDDragonVersion(),
     ]);
-    return { players, matches, ddVersion };
+    const { winStreaks, lossStreaks } = calcStreaks(players, allMatches);
+    return { players, matches: recentMatches, ddVersion, winStreaks, lossStreaks };
   } catch {
-    return { players: [], matches: [], ddVersion: "15.1.1" };
+    return { players: [], matches: [], ddVersion: "15.1.1", winStreaks: [], lossStreaks: [] };
   }
 }
 
 export default async function DashboardPage() {
-  const { players, matches, ddVersion } = await getData();
+  const { players, matches, winStreaks, lossStreaks } = await getData();
   const topPlayer = players[0];
 
   return (
@@ -45,6 +83,33 @@ export default async function DashboardPage() {
       </div>
 
       <IngameWidget />
+
+      {(winStreaks.length > 0 || lossStreaks.length > 0) && (
+        <div className={d.streakGrid}>
+          <div className={d.streakCard.win}>
+            <div className={d.streakTitle.win}>연승 중</div>
+            {winStreaks.length === 0 ? (
+              <p className={d.streakEmpty}>해당 없음</p>
+            ) : winStreaks.map((p) => (
+              <div key={p.name} className={d.streakRow}>
+                <span className={d.streakName}>{p.name}</span>
+                <span className={d.streakBadge.win}>{p.streak}연승</span>
+              </div>
+            ))}
+          </div>
+          <div className={d.streakCard.loss}>
+            <div className={d.streakTitle.loss}>연패 중</div>
+            {lossStreaks.length === 0 ? (
+              <p className={d.streakEmpty}>해당 없음</p>
+            ) : lossStreaks.map((p) => (
+              <div key={p.name} className={d.streakRow}>
+                <span className={d.streakName}>{p.name}</span>
+                <span className={d.streakBadge.loss}>{p.streak}연패</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className={s.grid4} style={{ marginBottom: "24px" }}>
         <div className={c.statCard}>
