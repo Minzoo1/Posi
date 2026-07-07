@@ -101,3 +101,20 @@ export const smallBtn = style({
   padding: `4px 10px`,
   fontSize: vars.fontSize.xs,
 });
+
+export const champRow = style({
+  display: "flex",
+  gap: "4px",
+  marginTop: "4px",
+  flexWrap: "wrap",
+});
+
+export const champBadge = style({
+  fontSize: "10px",
+  padding: `1px 6px`,
+  borderRadius: vars.radius.full,
+  backgroundColor: `${vars.color.primary}18`,
+  color: vars.color.primary,
+  fontWeight: "600",
+  cursor: "default",
+});

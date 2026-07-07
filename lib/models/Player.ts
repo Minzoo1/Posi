@@ -1,10 +1,18 @@
 import mongoose, { Schema, model, models } from "mongoose";
 
+export interface IChampionMastery {
+  championId: number;
+  championName: string;
+  championLevel: number;
+  championPoints: number;
+}
+
 export interface IPlayer {
   _id?: mongoose.Types.ObjectId;
   name: string;
   riotId: string;
   tag: string;
+  puuid: string;
   tier: string;
   rank: string;
   lp: number;
@@ -12,14 +20,25 @@ export interface IPlayer {
   wins: number;
   losses: number;
   mainPosition: string;
+  topChampions: IChampionMastery[];
+  recentWins: number;
+  recentLosses: number;
   createdAt?: Date;
 }
+
+const ChampionMasterySchema = new Schema<IChampionMastery>({
+  championId: Number,
+  championName: String,
+  championLevel: Number,
+  championPoints: Number,
+}, { _id: false });
 
 const PlayerSchema = new Schema<IPlayer>(
   {
     name: { type: String, required: true },
     riotId: { type: String, required: true, unique: true },
     tag: { type: String, required: true },
+    puuid: { type: String, default: "" },
     tier: { type: String, default: "UNRANKED" },
     rank: { type: String, default: "" },
     lp: { type: Number, default: 0 },
@@ -27,6 +46,9 @@ const PlayerSchema = new Schema<IPlayer>(
     wins: { type: Number, default: 0 },
     losses: { type: Number, default: 0 },
     mainPosition: { type: String, default: "FILL" },
+    topChampions: { type: [ChampionMasterySchema], default: [] },
+    recentWins: { type: Number, default: 0 },
+    recentLosses: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

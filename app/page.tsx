@@ -7,6 +7,7 @@ import { Match } from "@/lib/models/Match";
 import * as s from "./styles/layout.css";
 import * as c from "./styles/components.css";
 import * as d from "./dashboard.css";
+import IngameWidget from "./components/IngameWidget";
 
 async function getData() {
   try {
@@ -31,6 +32,8 @@ export default async function DashboardPage() {
         <h1 className={s.pageTitle}>대시보드</h1>
         <p className={s.pageSubtitle}>PosiEf 내전 현황</p>
       </div>
+
+      <IngameWidget />
 
       <div className={s.grid4} style={{ marginBottom: "24px" }}>
         <div className={c.statCard}>

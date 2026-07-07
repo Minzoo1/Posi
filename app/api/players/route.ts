@@ -26,7 +26,28 @@ export async function POST(req: NextRequest) {
   let tier = "UNRANKED";
   let rank = "";
   let lp = 0;
+  let puuid = "";
+  let topChampions: { championId: number; championName: string; championLevel: number; championPoints: number }[] = [];
+  let recentWins = 0;
+  let recentLosses = 0;
   let riotError: string | null = null;
+
+  // 챔피언 이름 매핑 (champion-mastery API는 championId만 반환하므로 DDragon에서 조회)
+  async function getChampionName(championId: number): Promise<string> {
+    try {
+      const verRes = await fetch("https://ddragon.leagueoflegends.com/api/versions.json");
+      const versions = await verRes.json();
+      const version = versions[0];
+      const champRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/ko_KR/champion.json`);
+      const champData = await champRes.json();
+      const champ = Object.values(champData.data as Record<string, { key: string; name: string }>).find(
+        (c) => Number(c.key) === championId
+      );
+      return champ?.name ?? String(championId);
+    } catch {
+      return String(championId);
+    }
+  }
 
   if (RIOT_API_KEY) {
     try {
@@ -40,35 +61,53 @@ export async function POST(req: NextRequest) {
         riotError = `계정 조회 실패 (${accountRes.status}): ${JSON.stringify(errBody)}`;
       } else {
         const account = await accountRes.json();
+        puuid = account.puuid;
 
-        // 2. puuid → summonerId
-        const summonerRes = await fetch(
-          `https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${account.puuid}`,
-          { headers: { "X-Riot-Token": RIOT_API_KEY } }
-        );
-        if (!summonerRes.ok) {
-          const errBody = await summonerRes.json().catch(() => ({}));
-          riotError = `소환사 조회 실패 (${summonerRes.status}): ${JSON.stringify(errBody)}`;
+        // 2. puuid → rank, mastery, recent matches 병렬 조회
+        const [rankRes, masteryRes, matchIdsRes] = await Promise.all([
+          fetch(`https://kr.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`, { headers: { "X-Riot-Token": RIOT_API_KEY } }),
+          fetch(`https://kr.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=3`, { headers: { "X-Riot-Token": RIOT_API_KEY } }),
+          fetch(`https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?queue=420&count=20`, { headers: { "X-Riot-Token": RIOT_API_KEY } }),
+        ]);
+
+        // 랭크
+        if (rankRes.ok) {
+          const ranks = await rankRes.json();
+          const solo = ranks.find((r: { queueType: string }) => r.queueType === "RANKED_SOLO_5x5");
+          if (solo) { tier = solo.tier; rank = solo.rank; lp = solo.leaguePoints; }
+          else riotError = "솔로랭크 기록 없음 (언랭)";
         } else {
-          const summoner = await summonerRes.json();
+          const errBody = await rankRes.json().catch(() => ({}));
+          riotError = `랭크 조회 실패 (${rankRes.status}): ${JSON.stringify(errBody)}`;
+        }
 
-          // 3. summonerId → rank
-          const rankRes = await fetch(
-            `https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/${summoner.id}`,
-            { headers: { "X-Riot-Token": RIOT_API_KEY } }
+        // 챔피언 마스터리
+        if (masteryRes.ok) {
+          const masteries = await masteryRes.json();
+          topChampions = await Promise.all(
+            masteries.map(async (m: { championId: number; championLevel: number; championPoints: number }) => ({
+              championId: m.championId,
+              championName: await getChampionName(m.championId),
+              championLevel: m.championLevel,
+              championPoints: m.championPoints,
+            }))
           );
-          if (!rankRes.ok) {
-            const errBody = await rankRes.json().catch(() => ({}));
-            riotError = `랭크 조회 실패 (${rankRes.status}): ${JSON.stringify(errBody)}`;
-          } else {
-            const ranks = await rankRes.json();
-            const solo = ranks.find((r: { queueType: string }) => r.queueType === "RANKED_SOLO_5x5");
-            if (solo) {
-              tier = solo.tier;
-              rank = solo.rank;
-              lp = solo.leaguePoints;
-            } else {
-              riotError = "솔로랭크 기록 없음 (언랭)";
+        }
+
+        // 최근 솔랭 전적
+        if (matchIdsRes.ok) {
+          const matchIds: string[] = await matchIdsRes.json();
+          const matchDetails = await Promise.all(
+            matchIds.slice(0, 20).map((id) =>
+              fetch(`https://asia.api.riotgames.com/lol/match/v5/matches/${id}`, { headers: { "X-Riot-Token": RIOT_API_KEY } })
+                .then((r) => r.ok ? r.json() : null)
+            )
+          );
+          for (const match of matchDetails) {
+            if (!match) continue;
+            const participant = match.info?.participants?.find((p: { puuid: string }) => p.puuid === puuid);
+            if (participant) {
+              if (participant.win) recentWins++; else recentLosses++;
             }
           }
         }
@@ -85,9 +124,13 @@ export async function POST(req: NextRequest) {
     riotId: riotId.toLowerCase(),
     tag: tag.toLowerCase(),
     mainPosition: mainPosition || "FILL",
+    puuid,
     tier,
     rank,
     lp,
+    topChampions,
+    recentWins,
+    recentLosses,
   });
 
   return NextResponse.json(

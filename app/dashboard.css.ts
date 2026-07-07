@@ -74,3 +74,52 @@ export const statSubValue = style({
   fontSize: vars.fontSize.sm,
   color: vars.color.textMuted,
 });
+
+export const ingameSection = style({
+  marginBottom: vars.space.lg,
+});
+
+export const ingameTitle = style({
+  fontSize: vars.fontSize.base,
+  fontWeight: "700",
+  marginBottom: vars.space.sm,
+  display: "flex",
+  alignItems: "center",
+  gap: vars.space.sm,
+});
+
+export const ingameDot = style({
+  width: "8px",
+  height: "8px",
+  borderRadius: "50%",
+  backgroundColor: "#22c55e",
+  display: "inline-block",
+  boxShadow: "0 0 6px #22c55e",
+});
+
+export const ingameCard = style({
+  display: "flex",
+  alignItems: "center",
+  gap: vars.space.md,
+  padding: `8px 14px`,
+  backgroundColor: `${"#22c55e"}11`,
+  border: `1px solid ${"#22c55e"}33`,
+  borderRadius: vars.radius.md,
+  marginBottom: vars.space.sm,
+});
+
+export const ingameName = style({
+  fontWeight: "700",
+  fontSize: vars.fontSize.base,
+});
+
+export const ingameChamp = style({
+  fontSize: vars.fontSize.sm,
+  color: vars.color.textSecondary,
+});
+
+export const ingameTime = style({
+  marginLeft: "auto",
+  fontSize: vars.fontSize.xs,
+  color: vars.color.textMuted,
+});

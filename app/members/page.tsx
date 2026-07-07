@@ -7,6 +7,13 @@ import * as m from "./members.css";
 
 const POSITIONS = ["TOP", "JG", "MID", "AD", "SUP"];
 
+interface ChampionMastery {
+  championId: number;
+  championName: string;
+  championLevel: number;
+  championPoints: number;
+}
+
 interface Player {
   _id: string;
   name: string;
@@ -19,6 +26,9 @@ interface Player {
   wins: number;
   losses: number;
   mainPosition: string;
+  topChampions: ChampionMastery[];
+  recentWins: number;
+  recentLosses: number;
 }
 
 export default function MembersPage() {
@@ -151,14 +161,33 @@ export default function MembersPage() {
                             {p.tier} {p.rank}
                           </span>
                         </div>
+                        {p.topChampions?.length > 0 && (
+                          <div className={m.champRow}>
+                            {p.topChampions.map((ch) => (
+                              <span key={ch.championId} className={m.champBadge} title={`${ch.championPoints.toLocaleString()}점`}>
+                                {ch.championName}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className={m.playerRight}>
                       <div>
                         <div className={m.eloText}>ELO {Math.round(p.elo)}</div>
                         <div className={`${m.wrText} ${wr >= 50 ? c.winText : c.lossText}`}>
-                          {p.wins}W {p.losses}L · {wr}%
+                          내전 {p.wins}W {p.losses}L · {wr}%
                         </div>
+                        {(p.recentWins + p.recentLosses) > 0 && (() => {
+                          const rTotal = p.recentWins + p.recentLosses;
+                          const rWr = Math.round((p.recentWins / rTotal) * 100);
+                          const streak = p.recentWins > p.recentLosses ? "연승 중" : "연패 중";
+                          return (
+                            <div className={`${m.wrText} ${rWr >= 50 ? c.winText : c.lossText}`}>
+                              솔랭 최근 {rTotal}게임 {rWr}% ({streak})
+                            </div>
+                          );
+                        })()}
                       </div>
                       <button
                         className={`${c.btn} ${c.btnDanger} ${m.smallBtn}`}
