@@ -159,14 +159,14 @@ export const streakPill = styleVariants({
     border: "1px solid #22c55e35",
     whiteSpace: "nowrap" as const,
     lineHeight: "1.4",
-    minWidth: "90px",
+    minWidth: "110px",
   },
   loss: {
     display: "inline-flex",
     flexDirection: "column" as const,
     alignItems: "center",
     justifyContent: "center",
-    padding: `12px 20px`,
+    padding: `14px 24px`,
     borderRadius: vars.radius.md,
     fontSize: vars.fontSize.base,
     fontWeight: "800",
@@ -176,7 +176,7 @@ export const streakPill = styleVariants({
     whiteSpace: "nowrap" as const,
     boxShadow: "0 0 14px #ef444425",
     lineHeight: "1.4",
-    minWidth: "90px",
+    minWidth: "110px",
   },
 });
 
