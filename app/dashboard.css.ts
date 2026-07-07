@@ -135,65 +135,97 @@ export const streakGrid = style({
 
 export const streakCard = styleVariants({
   win: {
-    backgroundColor: vars.color.bgCard,
-    border: `1px solid ${"#22c55e"}33`,
+    position: "relative",
+    overflow: "hidden",
     borderRadius: vars.radius.lg,
     padding: vars.space.lg,
+    background: "linear-gradient(135deg, #052e16 0%, #0f1629 60%)",
+    border: "1px solid #22c55e55",
+    boxShadow: "0 0 24px #22c55e18, inset 0 1px 0 #22c55e22",
   },
   loss: {
-    backgroundColor: vars.color.bgCard,
-    border: `1px solid ${"#ef4444"}33`,
+    position: "relative",
+    overflow: "hidden",
     borderRadius: vars.radius.lg,
     padding: vars.space.lg,
+    background: "linear-gradient(135deg, #2d0a0a 0%, #0f1629 60%)",
+    border: "1px solid #ef444455",
+    boxShadow: "0 0 24px #ef444418, inset 0 1px 0 #ef444422",
   },
 });
 
 export const streakTitle = styleVariants({
   win: {
-    fontSize: vars.fontSize.base,
-    fontWeight: "700",
+    fontSize: vars.fontSize.lg,
+    fontWeight: "800",
     color: "#22c55e",
-    marginBottom: vars.space.sm,
+    marginBottom: vars.space.md,
+    letterSpacing: "-0.3px",
+    display: "flex",
+    alignItems: "center",
+    gap: vars.space.sm,
   },
   loss: {
-    fontSize: vars.fontSize.base,
-    fontWeight: "700",
+    fontSize: vars.fontSize.lg,
+    fontWeight: "800",
     color: "#ef4444",
-    marginBottom: vars.space.sm,
+    marginBottom: vars.space.md,
+    letterSpacing: "-0.3px",
+    display: "flex",
+    alignItems: "center",
+    gap: vars.space.sm,
   },
 });
 
-export const streakRow = style({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: `7px 10px`,
-  borderRadius: vars.radius.sm,
-  marginBottom: "4px",
-  backgroundColor: vars.color.bg,
+export const streakRow = styleVariants({
+  win: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: `9px 12px`,
+    borderRadius: vars.radius.md,
+    marginBottom: "6px",
+    backgroundColor: "#22c55e0d",
+    border: "1px solid #22c55e22",
+  },
+  loss: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: `9px 12px`,
+    borderRadius: vars.radius.md,
+    marginBottom: "6px",
+    backgroundColor: "#ef44440d",
+    border: "1px solid #ef444422",
+  },
 });
 
 export const streakName = style({
-  fontWeight: "600",
-  fontSize: vars.fontSize.sm,
+  fontWeight: "700",
+  fontSize: vars.fontSize.base,
+  color: vars.color.text,
 });
 
 export const streakBadge = styleVariants({
   win: {
-    fontSize: vars.fontSize.xs,
+    fontSize: vars.fontSize.sm,
     fontWeight: "800",
-    padding: `2px 8px`,
+    padding: `3px 12px`,
     borderRadius: vars.radius.full,
-    backgroundColor: `${"#22c55e"}22`,
+    backgroundColor: "#22c55e22",
     color: "#22c55e",
+    border: "1px solid #22c55e44",
+    letterSpacing: "0.3px",
   },
   loss: {
-    fontSize: vars.fontSize.xs,
+    fontSize: vars.fontSize.sm,
     fontWeight: "800",
-    padding: `2px 8px`,
+    padding: `3px 12px`,
     borderRadius: vars.radius.full,
-    backgroundColor: `${"#ef4444"}22`,
+    backgroundColor: "#ef444422",
     color: "#ef4444",
+    border: "1px solid #ef444444",
+    letterSpacing: "0.3px",
   },
 });
 

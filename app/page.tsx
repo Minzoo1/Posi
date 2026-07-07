@@ -91,7 +91,7 @@ export default async function DashboardPage() {
             {winStreaks.length === 0 ? (
               <p className={d.streakEmpty}>해당 없음</p>
             ) : winStreaks.map((p) => (
-              <div key={p.name} className={d.streakRow}>
+              <div key={p.name} className={d.streakRow.win}>
                 <span className={d.streakName}>{p.name}</span>
                 <span className={d.streakBadge.win}>{p.streak}연승</span>
               </div>
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
             {lossStreaks.length === 0 ? (
               <p className={d.streakEmpty}>해당 없음</p>
             ) : lossStreaks.map((p) => (
-              <div key={p.name} className={d.streakRow}>
+              <div key={p.name} className={d.streakRow.loss}>
                 <span className={d.streakName}>{p.name}</span>
                 <span className={d.streakBadge.loss}>{p.streak}연패</span>
               </div>
